@@ -56,7 +56,7 @@ void WaitToTrasnfer(int socket,int Status)
 	struct pollfd ufds[1];
     ufds[0].fd = socket;
     int rv;
-    static const int TIME_OUT = 1000;
+    static const int TIME_OUT = 3000;
 	switch(Status)
 	{
 	case SEND_DATA:
@@ -74,7 +74,7 @@ void WaitToTrasnfer(int socket,int Status)
 		perror("error in poll");
 	}else if(rv == 0)
 	{
-		printf("Timeout occurred!  No data after 1 seconds.\n");
+		printf("Timeout occurred!  No data after %d seconds.\n",TIME_OUT/1000);
 	}
 }
 int send_image(int socket, char * Image_path){
@@ -100,14 +100,14 @@ int send_image(int socket, char * Image_path){
 
     //Send Picture Size
     printf("Sending Picture Size\n");
-    //WaitToTrasnfer(socket,SEND_DATA);
+    WaitToTrasnfer(socket,SEND_DATA);
     write(socket, (void *)&size, sizeof(int));
 
     //Send Picture as Byte Array
     printf("Sending Picture as Byte Array\n");
 
     do { //Read while we get errors that are due to signals.
-    	//WaitToTrasnfer(socket,RECIVE_DATA);
+    	WaitToTrasnfer(socket,RECIVE_DATA);
         stat=read(socket, &read_buffer , 255);
         printf("Bytes read: %i\n",stat);
     } while (stat < 0);
@@ -124,7 +124,7 @@ int send_image(int socket, char * Image_path){
         //Send data through our socket
         do
         {
-        	//WaitToTrasnfer(socket,SEND_DATA);
+        	WaitToTrasnfer(socket,SEND_DATA);
             stat = write(socket, send_buffer, read_size);
         }while (stat < 0);
 
@@ -142,12 +142,13 @@ int send_image(int socket, char * Image_path){
     stat = 0;
     bzero(read_buffer, sizeof(read_buffer));
     do { //Read while we get errors that are due to signals.
-    		//WaitToTrasnfer(socket,RECIVE_DATA);
-           	stat=read(socket, &read_buffer , 255);
-           	printf("Bytes read: %i\n",stat);
-           } while (stat < 0);
-           printf("Received data in socket\n");
-           printf("Socket data: %s\n", read_buffer);
+    	WaitToTrasnfer(socket,RECIVE_DATA);
+        stat=read(socket, &read_buffer , 255);
+        printf("Bytes read: %i\n",stat);
+    } while (stat < 0);
+
+    printf("Received data in socket\n");
+    printf("Socket data: %s\n", read_buffer);
     return 1;
 }
 
@@ -248,7 +249,7 @@ int main(void)
 
 
 		send_image(socketValue,ImagePath);
-		waitKey(100);
+		waitKey(1000);
 
     }
     close(socketValue);

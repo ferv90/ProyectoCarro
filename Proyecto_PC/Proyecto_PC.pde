@@ -3,7 +3,7 @@ Client myClient;
 int dataIn; 
 byte[] byteBuffer = new byte[10];
 String buffer = "Got it";
-byte[] ImageArray = new byte[10241];
+byte[] ImageArray = new byte[30241];
 int read_size = 0;
 int packageIndex = 0;
 int imageSize = 0;
@@ -29,20 +29,24 @@ int byteArrayToInt(byte[] b)
 }
 
 void draw() {
-  if (myClient.available() > 0) {
+  if (myClient.available() > 0) 
+  {
     int size = myClient.readBytes(byteBuffer); 
     imageSize = byteArrayToInt(byteBuffer);
     println("Package recived");
     println("Packet size: " + size);
     println("Image size: " + imageSize);
-    
+    delay(10);
     myClient.write(buffer);
-    
+    myClient.clear();
     println("Reply sent");
-  output1 = createOutput("imagen.jpg");
-    while (read_size < imageSize){
-      try{
-        while ( myClient.available() > 0){
+    output1 = createOutput("imagen.jpg");
+    while (read_size < imageSize)
+    {
+      try
+      {
+        while ( myClient.available() > 0)
+        {
           int totalBytes = myClient.readBytes(ImageArray);
           byte[] tmpBuffer= new byte[totalBytes]; 
           arrayCopy(ImageArray,tmpBuffer,totalBytes);
@@ -50,21 +54,25 @@ void draw() {
           read_size+=totalBytes;
         }
       }
-      catch (IOException e) {
+      catch (IOException e) 
+      {
         e.printStackTrace();
       }
     }
      println("Total received image size: " + read_size);
      read_size = 0;
      myClient.write("finish capture");
-     try { 
+     myClient.clear();
+     try 
+     { 
       output1.flush();  // Writes the remaining data to the file
       output1.close();  // Finishes the file
       photo = loadImage("imagen.jpg");
       image(photo, 0, 0);
     } 
   
-    catch (IOException e) {
+    catch (IOException e) 
+    {
       e.printStackTrace();
     }
   //  
